@@ -1,0 +1,104 @@
+// Фреймворк генератора сетки
+// Используется только для генерации правильно числа колонок разных $classes
+
+am-percentage($n)
+	if $n == 0
+		0
+	else
+		unit($n * 100, "%")
+
+// Центрированный контейнер
+make-grid-container($gutter = $grid-gutter-width)
+	padding-left ($gutter / 2)
+	padding-right ($gutter / 2)
+
+
+// Обертка для набора колонок
+make-row($gutter = $grid-gutter-width)
+	margin-left ($gutter / -2)
+	margin-right ($gutter / -2)
+
+make-grid-col($typeMod)
+	.{$typeMod} .{$prefix}__col
+		// Внутренний отступ
+		padding-left ($grid-gutter-width / 2)
+		padding-right ($grid-gutter-width / 2)
+
+calc-grid-column($index, $class, $typeMod, $type)
+	if $type == width and $index > 0
+		.{$typeMod} .{$prefix}__col_{$class}_{$index}
+			width am-percentage(($index / $grid-columns))
+	else if $type == push
+		if $index == 0
+			.{$typeMod} .{$prefix}__col_{$class}-push_0
+				left auto
+		else
+			.{$typeMod} .{$prefix}__col_{$class}-push_{$index}
+				left am-percentage(($index / $grid-columns))
+	else if $type == pull
+		if $index == 0
+			.{$typeMod} .{$prefix}__col_{$class}-pull_0
+				right auto
+		else
+			.{$typeMod} .{$prefix}__col_{$class}-pull_{$index}
+				right am-percentage(($index / $grid-columns))
+	else if $type == offset
+		.{$typeMod} .{$prefix}__col_{$class}-offset_{$index}
+			margin-left am-percentage(($index / $grid-columns))
+
+loop-grid-columns($grid-columns, $class, $typeMod, $type)
+	for $index in 0..$grid-columns
+		calc-grid-column($index, $class, $typeMod, $type)
+
+make-current-grid($class, $typeMod)
+	loop-grid-columns($grid-columns, $class, $typeMod, width)
+	loop-grid-columns($grid-columns, $class, $typeMod, pull)
+	loop-grid-columns($grid-columns, $class, $typeMod, push)
+	loop-grid-columns($grid-columns, $class, $typeMod, offset)
+
+// Создание сеток для переданного класса устройств
+make-grid($class, $typeMod, $media)
+	if $media
+		@media $media
+			make-current-grid($class, $typeMod)
+	else
+		make-current-grid($class, $typeMod)
+
+make-all-grids($type)
+
+	$typeMod = $prefix + '__container_type_' + $type
+
+	// Контейнеры различной ширины
+	$media-sm-min = '(min-width: ' + $screen-sm-min + ')'
+	$media-md-min = '(min-width: ' + $screen-md-min + ')'
+	$media-lg-min = '(min-width: ' + $screen-lg-min + ')'
+
+	.{$prefix}__container.{$typeMod}
+		make-grid-container()
+		@media $media-sm-min
+			width $container-sm
+		@media $media-md-min
+			width $container-md
+		@media $media-lg-min
+			width $container-lg
+
+	// Строка
+	//
+	// Строка хранит и чистит флоаты.
+	.{$typeMod} .{$prefix}__row
+		make-row()
+
+	// Столбцы
+	make-grid-col($typeMod, $typeMod)
+
+	// Сетка для телефонов
+	make-grid(xs, $typeMod, false)
+
+	// Сетка для планшетов и нетбуков
+	make-grid(sm, $typeMod, $media-sm-min)
+
+	// Сетка для мониторов
+	make-grid(md, $typeMod, $media-md-min)
+
+	// Сетка для широких экранов
+	make-grid(lg, $typeMod, $media-lg-min)

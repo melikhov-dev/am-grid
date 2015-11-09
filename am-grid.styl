@@ -1,0 +1,26 @@
+@import "mixins/framework"
+
+$prefix = 'am-grid';
+
+.{$prefix}
+	&__col, &__row, &__container
+		-moz-box-sizing border-box
+		-webkit-box-sizing border-box
+		box-sizing border-box
+
+
+	&__container
+		margin-right auto
+		margin-left auto
+		clearfix()
+
+	&__row
+		clearfix()
+
+	&__col
+		position relative
+		// Предотвращение схлопывания для пустых колонок
+		min-height 1px
+		padding-left 12.5px
+		padding-right 12.5px
+		float left
