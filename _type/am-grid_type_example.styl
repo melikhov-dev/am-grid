@@ -1,0 +1,42 @@
+/* Точки отсечки адаптивной сетки */
+
+// Обычный дисплей / PC
+$screen-sm-max = 960px
+
+/* Сетка */
+
+// Количество колонок.
+$grid-columns = 12
+
+// Расстояние между колонками.
+$grid-gutter-width = 20px
+
+/* Ширина контейнера */
+
+// Маленький экран / планшет
+$container-sm = (728px + $grid-gutter-width)
+
+// Обычный дисплей / PC
+$container-md = (940px + $grid-gutter-width)
+
+// Переопределяем сборку сетки
+make-all-grids($type)
+	$typeMod = $prefix + '__container_type_' + $type
+
+	.{$typeMod}
+		make-grid-container()
+		width $container-md
+
+		@media (max-width: $screen-sm-max)
+			width $container-sm
+
+		.{$prefix}__row
+			make-row()
+
+	make-grid-col($typeMod)
+	make-grid(xs, $typeMod, false)
+
+
+// Собираем сетку
+make-all-grids('gibdd-promo')
+
